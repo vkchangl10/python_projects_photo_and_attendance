@@ -1,32 +1,14 @@
-"""Database configuration for FastAPI using SQLAlchemy."""
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+"""Database utilities for FastAPI.
 
-from .config import settings
+FastAPI uses Django ORM directly through Django models.
+No SQLAlchemy needed - everything managed through Django.
+"""
+import os
+import django
 
-# Create database engine
-engine = create_engine(
-    settings.DATABASE_URL,
-    connect_args={"charset": "utf8mb4"},
-    echo=settings.DEBUG,
-)
+# Setup Django ORM
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "idmitra_django.settings")
+django.setup()
 
-# Create session factory
-SessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=engine,
-)
+# Now Django is ready to use
 
-# Create declarative base for models
-Base = declarative_base()
-
-
-def get_db():
-    """Get database session dependency."""
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
